@@ -28,6 +28,8 @@ Run the script from the command line by providing the required arguments:
 
 ```sh
 ./your_script_name.py -s your_fasta_file.fasta -c your_coordinate_file.txt -o output_file.fasta
+# optionally
+-m Intager # margin to substract to the start and add to end positions
 ```
 
 Replace your_script_name.py with the name of this Python script, your_fasta_file.fasta with the path to your input FASTA file, your_coordinate_file.txt with the path to your coordinate file, and output_file.fasta with the desired path for the output FASTA file containing the extracted subsequences.

@@ -1,4 +1,5 @@
-#!/usr/bin python
+#!/usr/bin/env python3
+ 
 import sys
 import os
 import re
@@ -56,10 +57,11 @@ def main(argv):
     fasta_file = False
     coordinate_file = False
     output_file = False
-
+    margin = 0
+    
     args = ' '.join(argv)
 
-    for arg in ['-s', '-c', '-o']:
+    for arg in ['-s', '-c', '-o', '-m']:
         regex = re.compile(r"%s\s+(\S+)" % (arg))
         m = re.search(regex, args)
 
@@ -117,11 +119,13 @@ def main(argv):
 
         if seq_record.id in coordinates:
             for c in coordinates[seq_record.id]:
+                start = c["start"] - margin
+                end = c["end"] + margin
                 # extract fragment sequence
-                fragment = Seq(str(seq_record.seq)[c["start"] - 1:c["end"]])
+                fragment = Seq(str(seq_record.seq)[start - 1:end])
                 # fragment description
                 description = "fragment start: %s end: %s" % (
-                    str(c["start"]), str(c["end"]))
+                    str(start), str(end))
                 # create output record
                 out_record = SeqRecord(
                     fragment.upper(),
