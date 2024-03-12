@@ -10,6 +10,11 @@ Before running the script, ensure you have Python 3.x installed on your system a
 pip install biopython
 ```
 
+Or install via:
+```sh
+pip install -r requirements.txt
+```
+
 # Script Overview
 The script takes three main arguments:
 
