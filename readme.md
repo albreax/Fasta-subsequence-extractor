@@ -27,7 +27,7 @@ The coordinate file should be formatted with one entry per line, where each line
 Run the script from the command line by providing the required arguments:
 
 ```sh
-./your_script_name.py -s your_fasta_file.fasta -c your_coordinate_file.txt -o output_file.fasta
+python ./extract_subsequences.py -s your_fasta_file.fasta -c your_coordinate_file.txt -o output_file.fasta
 # optionally
 -m Intager # margin to substract to the start and add to end positions
 ```

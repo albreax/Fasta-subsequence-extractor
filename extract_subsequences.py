@@ -6,6 +6,7 @@ import re
 from Bio import SeqIO
 from Bio.SeqRecord import SeqRecord
 from Bio.Seq import Seq
+import gzip
 
 __author__ = 'albrecht.naumann@posteo.de'
 
@@ -70,12 +71,17 @@ def main(argv):
                 "ERROR: Missing parameter\n" +
                 "read README.md for more information")
 
+        # if fasta file is zipped, open it with gzip
+        if arg == '-s' and is_valid_file(m.group(1), '.gz'):
+            fasta_file = gzip.open(m.group(1), 'rt')
         if arg == '-s' and is_valid_file(m.group(1), '.fasta'):
             fasta_file = m.group(1)
         elif arg == '-c' and is_valid_file(m.group(1), '.txt'):
             coordinate_file = m.group(1)
         elif arg == '-o':
             output_file = m.group(1)
+        elif arg == '-m':
+            margin = int(m.group(1))
 
     # is a fasta file passed
     if not fasta_file:
@@ -119,13 +125,20 @@ def main(argv):
 
         if seq_record.id in coordinates:
             for c in coordinates[seq_record.id]:
-                start = c["start"] - margin
-                end = c["end"] + margin
+                start = int(c["start"]) - margin
+                end = int(c["end"]) + margin
                 # extract fragment sequence
-                fragment = Seq(str(seq_record.seq)[start - 1:end])
+                fragment = Seq(str(seq_record.seq)[start:end])
                 # fragment description
                 description = "fragment start: %s end: %s" % (
                     str(start), str(end))
+                
+                # validate fragment length
+                # print("fragment length: ", len(fragment), "start: ", start, "end: ", end, "start:end", end - start)
+                if len(fragment) != (end - start):
+                  print("ERROR: fragment length not equal to given coordinates")
+                  continue
+                
                 # create output record
                 out_record = SeqRecord(
                     fragment.upper(),
