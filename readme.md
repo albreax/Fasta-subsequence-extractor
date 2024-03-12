@@ -34,7 +34,7 @@ Replace your_script_name.py with the name of this Python script, your_fasta_file
 
 # Example Coordinate File
 
-```sql
+```
 #SequenceID Start End
 Seq1 100 200
 Seq2 150 250
