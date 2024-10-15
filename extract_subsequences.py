@@ -1,19 +1,18 @@
 #!/usr/bin/env python3
- 
-import sys
-import os
-import re
-from Bio import SeqIO
-from Bio.SeqRecord import SeqRecord
-from Bio.Seq import Seq
-import gzip
-
-__author__ = 'albrecht.naumann@posteo.de'
-
 """
 The script extract subsequences from a given fasta file by a given
 coordinate txt. All extracted subsequences resulting in a output fasta file.
 """
+
+import sys
+import os
+import re
+import gzip
+from Bio import SeqIO
+from Bio.SeqRecord import SeqRecord
+from Bio.Seq import Seq
+
+__author__ = 'albrecht.naumann@posteo.de'
 
 
 def is_valid_file(s_file_path, s_file_type):
@@ -50,7 +49,6 @@ def parse_coordinate_line(line):
         start = c["end"]
         c["end"] = c["start"]
         c["start"] = start
-
     return c
 
 
@@ -59,7 +57,7 @@ def main(argv):
     coordinate_file = False
     output_file = False
     margin = 0
-    
+
     args = ' '.join(argv)
 
     for arg in ['-s', '-c', '-o', '-m']:
@@ -119,31 +117,36 @@ def main(argv):
     # clear file
     open(output_file, 'w').close()
     oh = open(output_file, "a")
-
+    frag_idx = {}
     # read given fasta file and process each sequence record
     for seq_record in SeqIO.parse(fasta_file, "fasta"):
 
         if seq_record.id in coordinates:
+
             for c in coordinates[seq_record.id]:
                 start = int(c["start"]) - margin
                 end = int(c["end"]) + margin
+                
                 # extract fragment sequence
                 fragment = Seq(str(seq_record.seq)[start:end])
                 # fragment description
-                description = "fragment start: %s end: %s" % (
-                    str(start), str(end))
-                
+                description = f"fragment start: {str(start)} end: {str(end)}"
+
                 # validate fragment length
                 # print("fragment length: ", len(fragment), "start: ", start, "end: ", end, "start:end", end - start)
                 if len(fragment) != (end - start):
                   print("ERROR: fragment length not equal to given coordinates")
                   continue
-                
+
+                if seq_record.id not in frag_idx:
+                    frag_idx[seq_record.id] = 1
+                else:
+                    frag_idx[seq_record.id] += 1
                 # create output record
                 out_record = SeqRecord(
-                    fragment.upper(),
-                    id=seq_record.id,
-                    description="<%s>" % (description)
+                    seq=fragment.upper(),
+                    id=f"{seq_record.id}_fragment{frag_idx[seq_record.id]}",
+                    description=f"<{description}>",
                 )
                 # append output record to output sequences
                 SeqIO.write(out_record, oh, "fasta")
